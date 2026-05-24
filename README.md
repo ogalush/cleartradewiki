@@ -1,0 +1,2 @@
+# cleartradewiki
+Cleartrade Communityで検討しているwikiのリポジトリ
