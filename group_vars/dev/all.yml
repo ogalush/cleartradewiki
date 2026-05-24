@@ -1,0 +1,9 @@
+app_dir: "/opt/wikijs"
+domain_name: "wikidev.ctcommunity.f5.si"
+db_host: "db"
+db_port: "5432"
+db_name: "wikijs"
+wiki_replicas: 3
+
+# 開発環境は外からアクセスできないため自己証明書を利用する
+caddy_use_internal_certs: true

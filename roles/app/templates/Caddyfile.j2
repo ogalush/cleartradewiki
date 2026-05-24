@@ -1,0 +1,13 @@
+# ★ 開発環境の場合だけ local_certs（--internal-certsと同等）を有効にする
+{% if caddy_use_internal_certs | default(false) %}
+{
+    local_certs
+}
+{% endif %}
+{{ domain_name }} {
+    # バックエンド（Wiki.js）へのリバースプロキシ設定
+    reverse_proxy wikijs:3000 {
+        # Replica調整で複数へ負荷分散した場合に Session Stickyにしてセッションを維持する
+        lb_policy cookie {{ domain_name }}_session 12h
+    }
+}
