@@ -24,31 +24,33 @@
     state: restarted
     enabled: yes
 
-- name: "Prepare DDNS Directory"
-  become: "yes"
-  file:
-    path: "/opt/ddns"
-    state: "directory"
-    owner: "root"
-    group: "root"
-    mode: "0755"
+- block:
+    - name: "Prepare DDNS Directory"
+      become: "yes"
+      file:
+        path: "/opt/ddns"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0755"
 
-- name: "Set Update DDNS Script."
-  become: "yes"
-  template:
-    src: "update_ddns.sh.j2"
-    dest: "/opt/ddns/update_ddns.sh"
-    owner: "root"
-    group: "root"
-    mode: "0700"
+    - name: "Set Update DDNS Script."
+      become: "yes"
+      template:
+        src: "update_ddns.sh.j2"
+        dest: "/opt/ddns/update_ddns.sh"
+        owner: "root"
+        group: "root"
+        mode: "0700"
 
-- name: "Set Update DDNS Crontab"
-  become: "yes"
-  cron:
-    name: "Update DDNS"
-    backup: "No"
-    cron_file: "/etc/cron.d/update_ddns"
-    minute: "15"
-    user: "root"
-    job: "bash /opt/ddns/update_ddns.sh 2>&1 | logger -t UPDATE_DDNS"
-    state: "present"
+    - name: "Set Update DDNS Crontab"
+      become: "yes"
+      cron:
+        name: "Update DDNS"
+        backup: "No"
+        cron_file: "/etc/cron.d/update_ddns"
+        minute: "15"
+        user: "root"
+        job: "bash /opt/ddns/update_ddns.sh 2>&1 | logger -t UPDATE_DDNS"
+        state: "present"
+  when: vault_ddns_id is defined

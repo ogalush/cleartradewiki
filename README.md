@@ -63,10 +63,15 @@ PostgreSQL
 2. ansible-playbookを用意する。
 3. 以下の様に実行する。
 ```
+(1) Dev: VM 開発環境
 % /opt/homebrew/bin/ansible-playbook -i dev.ini initialize.yml --user=rocky -bK --ask-vault-pass --list-hosts
 → 対象ホストが合っているか
 % /opt/homebrew/bin/ansible-playbook -i dev.ini initialize.yml --user=rocky -bK --ask-vault-pass
 → 成功するか
+
+(2) Dev2 Dockerのみ
+% /opt/homebrew/bin/ansible-playbook -i dev2.ini initialize_only_dev2.yml -bK --ask-vault-pass --list-hosts
+% /opt/homebrew/bin/ansible-playbook -i dev2.ini initialize_only_dev2.yml -bK --ask-vault-pass
 ```
 4. アクセス確認
 ブラウザアクセスして成功すること。
