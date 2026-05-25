@@ -20,9 +20,9 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-    # Replica調整で負荷分散させる設定
+    # Wiki.jsはIn-Memoryにデータを蓄える. AND Replica1で数千人賄えるため固定. (by Google Gemini)
     deploy:
-      replicas: {{ wiki_replicas }}
+      replicas: 1
     environment:
       DB_TYPE: postgres
       DB_HOST: {{ db_host }}
