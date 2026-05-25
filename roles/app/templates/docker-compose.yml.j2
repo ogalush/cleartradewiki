@@ -46,7 +46,7 @@ services:
       POSTGRES_USER: {{ vault_db_user }}
       POSTGRES_PASSWORD: {{ vault_db_password }}
     volumes:
-      - db_data:/postgresql/data
+      - db_data:/var/lib/postgresql/data
     networks:
       - default
 # 複数コンテナ間で同じデータを安全に共有するための名前付きボリューム定義

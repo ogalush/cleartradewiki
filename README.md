@@ -93,35 +93,70 @@ PostgreSQL
 |Locale| Language → Locale Settings → Japanese へ変更する|
 |タイトル| 全体設定 → サイト情報 → サイトのタイトル → サイト名を入れる|
 |ロゴ| 全般設定 → サイト情報 → ロゴ → ロゴのURLを削除する|
-|編集ボタン| 全般設定 → 編集ショートカット → 「編集メニューバーの表示」をON, 「外部編集ボタンを表示」をOFF|
 |Copyright| 全般設定 → サイト情報 → 「会社/組織名」へ組織名を入れる|
-|コメント|コメント機能は一旦OFFからスタートする. 全般設定 → Features → Comments を OFFにする|
+|コメント|全般設定 → Features → Comments を OFFにする|
+|編集ボタン| 全般設定 → 編集ショートカット → 「編集メニューバーの表示」をON, 「外部編集ボタンを表示」をOFF|
 
-(2) テーマ
+(2) ナビゲーション  
+画面左のページツリーを見やすくする。  
+
+|Key|Value|
+| --- | --- |
+|ナビベーションモード|サイトツリー|
+
+(3) テーマ
 |Key|Value|
 | --- | --- |
 |サイドメニュー（サブ）| テーマ → テーマオプション → 「Right」へ変更する|
 
-(3) グループ
+(4) グループ
 ロールを管理者、投稿者、ゲストの3種類にする。
 |Key|Value|
 | --- | --- |
 |Developグループ|ユーザ → グループ → (右上) NewGroup → 「Development」で作成する|
 
-(4) ユーザ
+(5) ユーザ
 作成したグループへ書き込み権限を付与する。  
 * Developユーザ → グループ → Development → Edit Group
 
 |Key|Value|
 | --- | --- |
-|PERMISSIONS|+write:page, +manage:pages, +write:assets, manage:assets|
-|PAGE RULES|+Create+ Edit Pages, +Rename / Move Pages, +View Pages Source, +View Page History, +Upload Assets, +Edit+Delete Assets|
+|PERMISSIONS|+write:page, +manage:pages, +delete:pages, +write:assets, manage:assets|
+|PAGE RULES|+Create+ Edit Pages, +Rename / Move Pages, +Delete Pages, +View Pages Source, +View Page History, +Upload Assets, +Edit+Delete Assets|
 
 * ★Guestユーザの削除★
 検討中  
 Guestユーザ＝ログインしていないアカウント(Annonymous)扱いの模様.  
 権限を落とす場合は、Guestグループの権限を落とす。
 
+(6) 登録ユーザの初期グループ  
+★ ここは運用時検討 Default Guestにして閲覧不可にしても良いとも思っている ★  
+手間を減らすため一時的に自己登録有りにする。  
+* 認証 → Local → 登録
+
+|Key|Value|
+| --- | --- |
+|自己登録を許可する| On |
+|割り当てるグループ| Developer |
+
+(7) メール登録  
+★ 送信メールアドレスを検討する必要がある. ★  
+自己登録を入れるため、メール送信サーバの設定を入れる。  
+
+* システム → メール
+|Key|Value|
+| --- | --- |
+|送信者名| よしなに |
+|送信者アドレス| よしなに |
+|ホスト| SMTPサーバ名|
+|ポート| 587 |
+|安全な通信(TLS)| Off (メールプロバイダ次第)|
+|SSL証明書の検証(StartTLS)| On (メールプロバイダ次第)|
+|ユーザ名|よしなに|
+|パスワード|よしなに|
+
+* テスト用のメールを送信する
+テストメールを送付する先を入力して送信。届けば設定OK。
 
 ## 初期ページの作成
 1. Wiki.jsのトップを開く
