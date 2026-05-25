@@ -1,0 +1,8 @@
+---
+- name: Setup Wiki.js environment on Rocky Linux 9
+  hosts: vm
+  become: yes
+  roles:
+    - vm
+    - docker
+    - app

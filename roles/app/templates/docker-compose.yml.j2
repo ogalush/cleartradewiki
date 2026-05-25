@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # HTTPS化とリバースプロキシを全自動化
+  reverse-proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+  # Wiki.js 本体（レプリカ構成）
+  wikijs:
+    image: ghcr.io/requarks/wiki:2
+    restart: unless-stopped
+    depends_on:
+      - db
+    # Replica調整で負荷分散させる設定
+    deploy:
+      replicas: {{ wiki_replicas }}
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: {{ db_host }}
+      DB_PORT: {{ db_port }}
+      DB_USER: {{ vault_db_user }}
+      DB_PASS: {{ vault_db_password }}
+      DB_NAME: {{ db_name }}
+    # 【重要】ボリュームのマウント方法を変更（後述）
+    volumes:
+      - wiki_data:/wiki/data
+
+  # PostgreSQL
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: {{ db_name }}
+      POSTGRES_USER: {{ vault_db_user }}
+      POSTGRES_PASSWORD: {{ vault_db_password }}
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+# ★ 複数コンテナ間で同じデータを安全に共有するための名前付きボリューム定義
+volumes:
+  wiki_data:

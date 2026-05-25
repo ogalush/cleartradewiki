@@ -1,0 +1,27 @@
+---
+- name: "Install dnf-plugins-core"
+  dnf:
+    name: dnf-plugins-core
+    state: present
+
+- name: "Add Docker official repository"
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: '0644'
+
+- name: "Install Docker and Compose plugin"
+  dnf:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: "Start and enable Docker service"
+  service:
+    name: docker
+    state: restarted
+    enabled: yes

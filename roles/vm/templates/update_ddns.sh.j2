@@ -1,0 +1,10 @@
+#!/bin/bash
+
+## Ref https://ddns.kuku.lu/manual.php#cron
+
+## URL Encode
+PW=`python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' '{{ vault_ddns_password }}'`
+
+## Update DDNS IP Address
+/usr/bin/curl "https://f5.si/update.php?domain={{ vault_ddns_id }}&password=${PW:?}" 2>&1 | logger -t DDNS_UPDATE
+## Update DDNS IP Address-END
