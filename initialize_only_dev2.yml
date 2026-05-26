@@ -1,0 +1,7 @@
+---
+- name: "Setup Wiki.js environment on docker compose (OSの異なるdocker向け)"
+  hosts: vm
+  become: yes
+  roles:
+    - app
+    - cloudflare

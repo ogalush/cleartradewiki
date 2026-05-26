@@ -1,0 +1,14 @@
+- name: "Deploy docker-compose-cloudflare.yml"
+  template:
+    src: docker-compose-cloudflare.yml.j2
+    dest: "{{ app_dir }}/docker-compose-cloudflare.yml"
+    mode: '0644'
+
+- name: "Run docker compose up"
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_dir }}"
+    files:
+      - docker-compose-cloudflare.yml
+    state: present
+  # ansible_check_mode が true（--check時）ならブロック全体をスキップ
+  when: not ansible_check_mode

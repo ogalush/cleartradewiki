@@ -6,7 +6,7 @@ Cleartrade Communityで検討しているwikiのリポジトリ
 目的はCommunity内での知識の共有。
 
 ## 開発の経緯
-[2026.5.23 質疑応答会](https://www.chatwork.com/#!rid175176676-2110216131632693248)で以下の話が示された。
+[2026.5.23 質疑応答会](https://www.chatwork.com/#!rid175176676-2110216131632693248)で話が示された。
 * 単発チャットでは情報が流れてしまう。
 * 知識の持続的蓄積が難しい課題に対して、メンバー共同編集が可能な「Wikipedia的」ナレッジベースを構築する。
 
@@ -27,9 +27,10 @@ Cleartrade Communityで検討しているwikiのリポジトリ
 
 # システム面
 ## システム構成
-まず `wiki.js` を構築する。  
+最初の候補である `wiki.js` を構築する。  
 メンテナンス性を考慮してansible-playbookで構築出来る仕組みにする。  
 [ツール設定・操作](https://www.chatwork.com/#!rid379516146-2110272628421033984)
+### 想定環境
 ```
 [Wikiの投稿、閲覧ユーザ]
 ブラウザ
@@ -57,19 +58,51 @@ Wiki.js
     ▼
 PostgreSQL
 ```
+### 検証環境
+dev2 (Docker)  
+自宅LANの中にdockerを置いたので、外からアクセスできる様にする.  
+WAN側がCGNATのIPアドレスのためトンネルで繋ぐ.  
+```
+[インターネット] --> [Cloudflare] - tunnel -> [ECS Liva (Ubuntu24.04 + docker-compose)]
+※ docker-compose
+ - cloudflared
+ - docker-compose
+ - wikijs
+ - postgresql
+ - caddy (Reverse Proxy)
+```
 
 ## 構築手順
 1. VMを用意する。
 2. ansible-playbookを用意する。
 3. 以下の様に実行する。
 ```
+(1) Dev: VM 開発環境
 % /opt/homebrew/bin/ansible-playbook -i dev.ini initialize.yml --user=rocky -bK --ask-vault-pass --list-hosts
 → 対象ホストが合っているか
 % /opt/homebrew/bin/ansible-playbook -i dev.ini initialize.yml --user=rocky -bK --ask-vault-pass
 → 成功するか
+
+(2) Dev2 Dockerのみ
+% /opt/homebrew/bin/ansible-playbook -i dev2.ini initialize_only_dev2.yml -bK --ask-vault-pass --list-hosts
+% /opt/homebrew/bin/ansible-playbook -i dev2.ini initialize_only_dev2.yml -bK --ask-vault-pass
 ```
+
+構築後の状況
+```
+----
+$ docker ps
+CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS          PORTS                                                                NAMES
+2245b648e916   cloudflare/cloudflared:latest   "cloudflared --no-au…"   17 minutes ago   Up 17 minutes                                                                        wikijs-cloudflare-tunnel-1
+75e86d238502   ghcr.io/requarks/wiki:2         "docker-entrypoint.s…"   17 minutes ago   Up 17 minutes   3000/tcp, 3443/tcp                                                   wikijs-wikijs-1
+7a52054bece7   postgres:15-alpine              "docker-entrypoint.s…"   17 minutes ago   Up 17 minutes   5432/tcp                                                             wikijs-db-1
+40305f27471b   caddy:2-alpine                  "caddy run --config …"   17 minutes ago   Up 17 minutes   80/tcp, 2019/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp, 443/udp   wikijs-reverse-proxy-1
+----
+```
+
 4. アクセス確認
 ブラウザアクセスして成功すること。
+
 |Key|Value|
 | --- | --- |
 |Dev| [Devサイト](https://wikidev.ctcommunity.f5.si/)|
@@ -88,34 +121,84 @@ PostgreSQL
 |Locale| Language → Locale Settings → Japanese へ変更する|
 |タイトル| 全体設定 → サイト情報 → サイトのタイトル → サイト名を入れる|
 |ロゴ| 全般設定 → サイト情報 → ロゴ → ロゴのURLを削除する|
-|編集ボタン| 全般設定 → 編集ショートカット → 「編集メニューバーの表示」をON, 「外部編集ボタンを表示」をOFF|
 |Copyright| 全般設定 → サイト情報 → 「会社/組織名」へ組織名を入れる|
-|コメント|コメント機能は一旦OFFからスタートする. 全般設定 → Features → Comments を OFFにする|
+|コメント|全般設定 → Features → Comments を OFFにする|
+|編集ボタン| 全般設定 → 編集ショートカット → 「編集メニューバーの表示」をON, 「外部編集ボタンを表示」をOFF|
 
-(2) テーマ
+(2) ナビゲーション  
+画面左のページツリーを見やすくする。  
+
+|Key|Value|
+| --- | --- |
+|ナビベーションモード|サイトツリー|
+
+(3) テーマ
 |Key|Value|
 | --- | --- |
 |サイドメニュー（サブ）| テーマ → テーマオプション → 「Right」へ変更する|
 
-(3) グループ
+(4) グループ
 ロールを管理者、投稿者、ゲストの3種類にする。
 |Key|Value|
 | --- | --- |
 |Developグループ|ユーザ → グループ → (右上) NewGroup → 「Development」で作成する|
 
-(4) ユーザ
+(5) ユーザ
 作成したグループへ書き込み権限を付与する。  
 * Developユーザ → グループ → Development → Edit Group
 
 |Key|Value|
 | --- | --- |
-|PERMISSIONS|+write:page, +manage:pages, +write:assets, manage:assets|
-|PAGE RULES|+Create+ Edit Pages, +Rename / Move Pages, +View Pages Source, +View Page History, +Upload Assets, +Edit+Delete Assets|
+|PERMISSIONS|+write:page, +manage:pages, +delete:pages, +write:assets, manage:assets|
+|PAGE RULES|+Create+ Edit Pages, +Rename / Move Pages, +Delete Pages, +View Pages Source, +View Page History, +Upload Assets, +Edit+Delete Assets|
 
 * ★Guestユーザの削除★
 検討中  
 Guestユーザ＝ログインしていないアカウント(Annonymous)扱いの模様.  
 権限を落とす場合は、Guestグループの権限を落とす。
+
+(6) 登録ユーザの初期グループ  
+★ ここは運用時検討 Default Guestにして閲覧不可にしても良いとも思っている ★  
+手間を減らすため一時的に自己登録有りにする。  
+* 認証 → Local → 登録
+
+|Key|Value|
+| --- | --- |
+|自己登録を許可する| On |
+|割り当てるグループ| Developer |
+
+
+(7) ストレージ設定  
+wikiへアップロードされたファイルを永続化するためLocalDisk保存にする.  
+
+* モジュール → ストレージ
+
+|Key|Value|
+| --- | --- |
+|Local File System|チェック|
+|Local File System| `/wiki/data/uploads` |
+|Create Daily Backups| チェック (とりあえず1ヶ月分取ってくれる) |
+
+
+(8) メール登録  
+★ 送信メールアドレスを検討する必要がある. ★  
+自己登録を入れるため、メール送信サーバの設定を入れる。  
+
+* システム → メール
+
+|Key|Value|
+| --- | --- |
+|送信者名| よしなに |
+|送信者アドレス| よしなに |
+|ホスト| SMTPサーバ名|
+|ポート| 587 |
+|安全な通信(TLS)| Off (メールプロバイダ次第)|
+|SSL証明書の検証(StartTLS)| On (メールプロバイダ次第)|
+|ユーザ名|よしなに|
+|パスワード|よしなに|
+
+* テスト用のメールを送信する
+テストメールを送付する先を入力して送信。届けば設定OK。
 
 
 ## 初期ページの作成

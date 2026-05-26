@@ -1,5 +1,5 @@
 app_dir: "/opt/wikijs"
-domain_name: "wikidev.ctcommunity.f5.si"
+domain_name: "wikidev.lushspknet.com"
 db_host: "db"
 db_port: "5432"
 db_name: "wikijs"
