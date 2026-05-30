@@ -167,8 +167,16 @@ Guestユーザ＝ログインしていないアカウント(Annonymous)扱いの
 |自己登録を許可する| On |
 |割り当てるグループ| Developer |
 
+(7) タイムゾーン変更  
+wiki.jsのデフォルト設定が「America/New_York」である。日本時間へ変更する。
+```
+$ docker exec -t wikijs-db-1 psql -U wikijs -d wikijs -c "ALTER TABLE users ALTER COLUMN timezone SET DEFAULT 'Asia/Tokyo';"
+$ docker exec -t wikijs-db-1 psql -U wikijs -d wikijs -c "UPDATE users SET \"timezone\" = 'Asia/Tokyo';"
+$ docker exec -t wikijs-db-1 psql -U wikijs -d wikijs -c "ALTER TABLE users ALTER COLUMN \"localeCode\" SET DEFAULT 'ja';"
+$ docker exec -t wikijs-db-1 psql -U wikijs -d wikijs -c "UPDATE users SET \"localeCode\" = 'ja';"
+```
 
-(7) ストレージ設定  
+(8) ストレージ設定  
 wikiへアップロードされたファイルを永続化するためLocalDisk保存にする.  
 
 * モジュール → ストレージ
@@ -180,7 +188,7 @@ wikiへアップロードされたファイルを永続化するためLocalDisk�
 |Create Daily Backups| チェック (とりあえず1ヶ月分取ってくれる) |
 
 
-(8) メール登録  
+(9) メール登録  
 ★ 送信メールアドレスを検討する必要がある. ★  
 自己登録を入れるため、メール送信サーバの設定を入れる。  
 
