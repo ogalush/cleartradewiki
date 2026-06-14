@@ -63,7 +63,7 @@ dev2 (Docker)
 自宅LANの中にdockerを置いたので、外からアクセスできる様にする.  
 WAN側がCGNATのIPアドレスのためトンネルで繋ぐ.  
 ```
-[インターネット] --> [Cloudflare] - tunnel -> [ECS Liva (Ubuntu24.04 + docker-compose)]
+[インターネット] --> [Cloudflare] - tunnel -> [ASUS ExpertCenter PN42 (Ubuntu26.04 + docker-compose)]
 ※ docker-compose
  - cloudflared
  - docker-compose
@@ -106,6 +106,7 @@ CONTAINER ID   IMAGE                           COMMAND                  CREATED 
 |Key|Value|
 | --- | --- |
 |Dev| [Devサイト](https://wikidev.ctcommunity.f5.si/)|
+|Dev2| [コミュニティお試し環境](https://wikidev.lushspknet.com/)|
 |Prod| TBD|
 
 5. 管理者設定
